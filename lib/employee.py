@@ -2,6 +2,7 @@
 from __init__ import CURSOR, CONN
 from department import Department
 
+
 class Employee:
 
     # Dictionary of objects saved to the database.
@@ -186,5 +187,15 @@ class Employee:
         return cls.instance_from_db(row) if row else None
 
     def reviews(self):
-        """Return list of reviews associated with current employee"""
-        pass
+        """Return a list of reviews associated with the current Employee instance."""
+        from review import Review  # Import Review class within the method to avoid circular imports
+        
+        sql = """
+            SELECT * 
+            FROM reviews
+            WHERE employee_id = ?
+        """
+        CURSOR.execute(sql, (self.id,))  # Use the employee's id to query reviews
+
+        rows = CURSOR.fetchall()  # Fetch all matching rows
+        return [Review.instance_from_db(row) for row in rows]  # Convert rows to Review instances
